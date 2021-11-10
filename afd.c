@@ -164,7 +164,7 @@ int afd_simul(char *s, afd A){
     uint curr_state = A.init;
     uint i = 0;
     char curr_char;
-    while(i<strlen(s)) {
+    while(i<strlen(s) && curr_state != ETAT_NONE) {
         curr_char = s[i];
         curr_state = A.delta[curr_state][A.tsymb[curr_char-SYMB_ASCII_DEB]];
         i++;

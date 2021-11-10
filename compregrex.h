@@ -8,7 +8,7 @@
 #include "stack.h"
 #include "afn.h"
 
-typedef enum{PO, PF, OP, CHAR} type_t;
+typedef enum{PO, PF, OP, CHAR, CO, CF} type_t;
 typedef struct  {
     type_t type;
     char val;

@@ -8,8 +8,10 @@ int main(int argc, char* argv[]) {
     unilex_t * arr_ul = scanner(regex);
     print_arr_ul(arr_ul, strlen(regex));
     char * rpn = parser(arr_ul, strlen(regex));
+    free(arr_ul);
     printf("here --->%s\n", rpn);
     printf("--->%ld\n", strlen(rpn));
     afd res = codegen(rpn);
     printf("--->%d\n",afd_simul(str, res));
+    afd_free(&res);
 }

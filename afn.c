@@ -361,6 +361,9 @@ void afn_determinisation(afn A, afd *D) {
     for(i = 0; i< trans_i; i++) {
         afd_add_trans(D, trans[i].q, trans[i].c, trans[i].q2);
     }
+    free(states_q);
+    free(trans);
+    free(finals);
 }
 
 /*
@@ -460,10 +463,10 @@ void afn_concat(afn *C, afn A, afn B) {
   Calcule un automate qui reconnait la fermeture de Kleene de <A>
 */
 void afn_kleene(afn *C, afn A) {
-    afn_init(C, A.nbetat, A.alphabet, A.init, A.finals);
-    add_all_trans(C, A, 0);
+    afn_init(C, A.nbetat+1, A.alphabet, 1, 1);
+    add_all_trans(C, A, 1);
     ullong finals = A.finals;
-    ullong initials;
+    ullong initials = A.init;
     ullong temp;
     uint state_f;
     uint state_i;
@@ -471,13 +474,12 @@ void afn_kleene(afn *C, afn A) {
        temp = finals;
        finals &= finals - 1;
        state_f = log(temp^finals)/log(2);
-       initials = A.init;
-       while(initials) {
-           temp = initials;
-           initials &= initials - 1;
-           state_i = log(initials^temp)/log(2);
-           afn_add_trans(C, state_f, '&', state_i);
-       }
+       afn_add_trans(C, state_f+1, '&', 0);
     }
-
+    while(initials) {
+       temp = initials;
+       initials &= initials - 1;
+       state_i = log(temp^initials)/log(2);
+       afn_add_trans(C, 0, '&', state_i+1);
+    }
 }

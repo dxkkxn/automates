@@ -34,6 +34,7 @@ unilex_t * scanner(char * str) {
                 arr_ul[i].type = OP;
                 arr_ul[i].val =  *str;
                 break;
+
             default:
                 if (is_char(*str)) {
                     arr_ul[i].type = CHAR;
@@ -141,41 +142,43 @@ bool reste_f() {
 afd codegen(char * rpn_n) {
     printf("here>>>>rpn = %s\n", rpn);
     stack_t stack = NULL;
-    afn * curr_af;
+    afn curr_af;
     afn aux_af;
     afn aux_af2;
     while (*rpn != '\0') {
         printf("*rpn = %c\n", *rpn);
-        curr_af = malloc(sizeof(afn));
         if (is_char(*rpn)) {
-            afn_char(curr_af, *rpn);
-            push(&stack, *curr_af);
+            afn_char(&curr_af, *rpn);
+            push(&stack, curr_af);
         } else if (*rpn == '*') {
             aux_af = pop(&stack);
-            afn_kleene(curr_af, aux_af);
+            afn_kleene(&curr_af, aux_af);
             afn_free(&aux_af);
-            push(&stack, *curr_af);
+            push(&stack, curr_af);
         } else if (*rpn == '.'){
             aux_af = pop(&stack);
             aux_af2 = pop(&stack);
-            afn_concat(curr_af, aux_af2, aux_af);
+            afn_concat(&curr_af, aux_af2, aux_af);
             afn_free(&aux_af);
             afn_free(&aux_af2);
-            push(&stack, *curr_af);
+            push(&stack, curr_af);
         } else {
             assert(*rpn == '+');
             aux_af = pop(&stack);
             aux_af2 = pop(&stack);
-            afn_union(curr_af, aux_af2, aux_af);
+            afn_union(&curr_af, aux_af2, aux_af);
             afn_free(&aux_af);
             afn_free(&aux_af2);
-            push(&stack, *curr_af);
+            push(&stack, curr_af);
         }
         rpn++;
         print_stack(stack);
     }
     afd res;
-    afn_determinisation(pop(&stack), &res);
+    afn final = pop(&stack);
+    afn_determinisation(final, &res);
     afd_print(res);
+    afn_free(&final);
+    free(rpn_n);
     return res;
 }
