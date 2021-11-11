@@ -7,6 +7,15 @@ bool is_char(char c) {
     return(minus || mayus || c == '&');
 }
 
+/* 
+ * Returns true if char c is a int between 1<=c<=9
+*/
+bool is_int(char c) {
+    // ascii 1 -> 49
+    // ascii 9 -> 57
+    return (49<=c && c <=57);
+}
+
 void print_arr_ul(unilex_t * arr, uint size) {
     printf("[");
     uint i;
@@ -34,13 +43,31 @@ unilex_t * scanner(char * str) {
                 arr_ul[i].type = OP;
                 arr_ul[i].val =  *str;
                 break;
-
+            case '[':
+                arr_ul[i].type = CO;
+                arr_ul[i].val = '[';
+                break;
+            case ']':
+                arr_ul[i].type = CF;
+                arr_ul[i].val = ']';
+                break;
+            case '{':
+                arr_ul[i].type = AO;
+                arr_ul[i].val = '{';
+                break;
+            case '}':
+                arr_ul[i].type = AF;
+                arr_ul[i].val = '}';
+                break;
             default:
-                if (is_char(*str)) {
+                if (is_int(*str)) {
+                    arr_ul[i].type = NB;
+                    arr_ul[i].val = *str;
+                } else if (is_char(*str)) {
                     arr_ul[i].type = CHAR;
                     arr_ul[i].val =  *str;
                 } else {
-                    fprintf(stderr, "[scanner] SYNTAX ERROR near character %c", *str);
+                    fprintf(stderr, "[scanner] LEXICAL ERROR near character %c\n", *str);
                     exit(-1);
                 }
                 break;
@@ -62,8 +89,10 @@ unilex_t * scanner(char * str) {
  *
  * Fact  -> Reste_F*
  *       |  Reste_F
+ *       |  Reste_F{n}
  * Reste_F -> CHAR
  *         | ( Expr )
+ *         | [char *] //chaine de characters
 */
 uint i = 0;
 uint top = 0;
@@ -75,8 +104,12 @@ char * parser(unilex_t * arr_ul, uint size) {
     n = size;
     rpn = calloc(size+1, sizeof(char));
     assert(rpn != NULL);
-    if(expr() && i == size)
+    if(expr() && i == size) {
         return rpn;
+    } else {
+        printf("[parser] SYNTAX ERROR near character %c\n", l[i].val);
+        exit(-1);
+    }
     rpn = NULL;
     return rpn;
 }
@@ -118,6 +151,15 @@ bool fact() {
         if (i < n && l[i].val == '*') {
             rpn[top++] = '*';
             i++;
+            return true;
+        } else if (i < n && l[i].type == AO) {
+            i++;
+            if ((i < n && l[i].type == NB) && ((i+1) < n && l[++i].type == AF)) {
+                rpn[top++] = l[i-1].val;
+                i++;
+            } else {
+                return false;
+            }
         }
         return true;
     }
@@ -135,8 +177,43 @@ bool reste_f() {
             i++;
             return true;
         }
+    } else if (i < n && l[i].type == CO) {
+        rpn[top++] = l[i++].val;
+        while (i < n && l[i].type == CHAR) {
+            rpn[top++] = l[i].val;
+            i++;
+        }
+        if (i == n || l[i].type != CF) {
+            return false;
+        }
+        rpn[top++] = l[i].val;
+        i++;
+        return true;
     }
     return false;
+}
+
+/* Take a str starting with a [ and fills res with the str between that
+ *first [ and the next ] and returns the size of res */
+uint extract_str_in_brackets(char** res, char* str) {
+    assert(*str== '[');
+    str++;
+    char * copy = str;
+    // calculate the size of the str in brackets
+    uint size = 0;
+    while(*copy != ']') {
+        copy++;
+        size++;
+    }
+    // copy the str
+    (*res) = calloc(size+1, sizeof(char));
+    uint i = 0;
+    while(*str != ']') {
+        *(*res + i) = *str;
+        i++;
+        str++;
+    }
+    return size;
 }
 
 afd codegen(char * rpn_n) {
@@ -145,6 +222,8 @@ afd codegen(char * rpn_n) {
     afn curr_af;
     afn aux_af;
     afn aux_af2;
+    char * temp = NULL;
+    uint nb_rep;
     while (*rpn != '\0') {
         printf("*rpn = %c\n", *rpn);
         if (is_char(*rpn)) {
@@ -162,6 +241,24 @@ afd codegen(char * rpn_n) {
             afn_free(&aux_af);
             afn_free(&aux_af2);
             push(&stack, curr_af);
+        } else if (*rpn == '[') {
+           rpn += extract_str_in_brackets(&temp, rpn);
+           rpn++; // to be at ] char
+           afn_chaine(&curr_af, temp);
+           push(&stack, curr_af);
+           free(temp);
+        } else if (is_int(*rpn)) {
+            nb_rep = *rpn - 48 - 1;
+            aux_af = pop(&stack);
+            afn_copy(&curr_af, &aux_af);
+            while (nb_rep) {
+                afn_concat(&aux_af2, curr_af, aux_af);
+                afn_free(&curr_af);
+                curr_af = aux_af2;
+                nb_rep--;
+            }
+            push(&stack, curr_af);
+            afn_free(&aux_af);
         } else {
             assert(*rpn == '+');
             aux_af = pop(&stack);

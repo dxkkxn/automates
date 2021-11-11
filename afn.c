@@ -111,7 +111,23 @@ void afn_print(afn A) {
     }
 }
 
-
+/*
+ * Deep copy de afn src in the afd dest
+*/
+void afn_copy(afn *dest, afn *src) {
+  afn_init(dest, src->nbetat, src->alphabet, src->init, src->finals);
+  char* alphabet;
+  for (int i = 0; i < src->nbetat; i++) {
+      for (int j = 0; j < src->nbetat; j++) {
+          alphabet = src->alphabet;
+          while (*alphabet != '\0') {
+              if (exist_trans(*src, i, *alphabet, j))
+                  afn_add_trans(dest, i, *alphabet, j);
+              alphabet++;
+              }
+          }
+    }
+  }
 
 /*
   Initialise l'AFN <A> a partir des donnees du fichier <nomfichier> au
@@ -191,39 +207,27 @@ void print_array(ullong* array, int n) {
   l'automate <A>
 */
 ullong afn_epsilon_fermeture(afn A, ullong R) {
-    uchar track[A.nbetat];
-    for(uint i = 0; i < A.nbetat; i++) {
-        track[i] = 0;
-    }
-    ullong stack[INT_ETAT(A.nbetat)-1];
+    ullong stack[A.nbetat];
     int top = -1;
-
-    ullong r = R; //copy of R
-    ullong temp;
-    ullong state;
-    while (r) {
-        temp = r;
-        r &= r - 1;
-        state = log(temp^r)/log(2);
-        top++;
-        stack[top] = state;
+    ullong state = 0;
+    while (state < A.nbetat) {
+        if (IN(state, R))
+            stack[++top] = state;
+        state++;
     }
     ullong ferm = R;
     ullong q;
     ullong q2;
-    while (top != -1) {
-        q = stack[top];
-        top--;
+    while (top >= 0) {
+        q = stack[top--];
         q2 = 0;
-        while (A.nbetat > q2 && track[q] == 0) {
-            if(exist_trans(A, q, '&', q2) ) {
+        while (q2 < A.nbetat) {
+            if(((ferm & INT_ETAT(q2)) == 0) && exist_trans(A, q, '&', q2)) {
                 ferm |= INT_ETAT(q2);
-                top++;
-                stack[top] = q2;
+                stack[++top] = q2;
             }
             q2++;
         }
-        track[q] = 1;
     }
     return ferm;
 }
@@ -481,5 +485,13 @@ void afn_kleene(afn *C, afn A) {
        initials &= initials - 1;
        state_i = log(temp^initials)/log(2);
        afn_add_trans(C, 0, '&', state_i+1);
+    }
+}
+
+void afn_chaine(afn *C, char * str) {
+    afn_init(C, 2, ALPHABET, 1, 2);
+    while (*str != 0) {
+        afn_add_trans(C, 0, *str, 1);
+        str++;
     }
 }

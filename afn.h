@@ -38,11 +38,14 @@ void afn_finit(afn *A, char *f);
 
 ullong afn_epsilon_fermeture(afn A, ullong R);
 void afn_determinisation(afn A, afd *D);
+ullong exist_trans(afn A, ullong q, char c, ullong p) ;
 
 void afn_char(afn *C, char c);
 void afn_union(afn *C, afn A, afn B);
 void afn_concat(afn *C, afn A, afn B);
 void afn_kleene(afn *C, afn A);
+void afn_chaine(afn *C, char * str);
+void afn_copy(afn *dest, afn* src);
 
 
 
