@@ -21,13 +21,13 @@ void afd_init(afd *A, uint nbetat, char * alphabet, uint nbfinal, uint init, uin
     
     if ( (*alphabet < SYMB_ASCII_DEB) ||
 	 (*alphabet > SYMB_ASCII_FIN) ){
-      fprintf(stderr,"[afd_init] caractere ascii numero %d invalide\n", *alphabet);
+      fprintf(stderr,"[afd_init] caractère ascii numéro %d invalide\n", *alphabet);
       exit(-1);
     }
     
     symb = (uchar) (*alphabet - SYMB_ASCII_DEB);
     if ( A->tsymb[symb] != SYMB_NONE ){
-      fprintf(stderr,"[afd_init] caractere <%c> deja defini (ignorer)\n",symb);
+      fprintf(stderr,"[afd_init] caractère <%c> déjà défini (ignorer)\n",symb);
     }
     else {
       A->tsymb[symb] = nbsymb;
@@ -68,11 +68,11 @@ void afd_add_trans(afd *A, uint q1, uint s, uint q2) {
   }
 
   if ( (q1<0) || (q1>=A->nbetat) ){
-   fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q1);
+   fprintf(stderr, "[add_trans] état <%d> non reconnu\n", q1);
     exit(-1);
   }
   if ( (q2<0) || (q2>=A->nbetat) ){
-   fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q2);
+   fprintf(stderr, "[add_trans] état <%d> non reconnu\n", q2);
     exit(-1);
   }
 
@@ -106,8 +106,8 @@ void afd_print(afd A) {
   int i;
   
 
-  printf("etat initial: %d\n", A.init);
-  printf("etats finals:");
+  printf("état initial: %d\n", A.init);
+  printf("états finals:");
 
   for (i=0; i< A.nbfinal; i++){
     printf(" %u", A.finals[i]);
@@ -151,10 +151,10 @@ void afd_finit(afd *A, char *nomfichier) {
     }
     afd_init(A, nb_etat, alphabet, nb_final, init, finals);
 
-    uint state_i; //state i
-    uint state_j; //state j
+    uint state_i; // état i
+    uint state_j; // état j
     uchar symb;
-    // statei symb statej
+    // état i symb état j
     while(fscanf(f, "%u %c %u", &state_i, &symb, &state_j) == 3) {
         afd_add_trans(A, state_i, symb, state_j);
     }
