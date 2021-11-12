@@ -259,7 +259,7 @@ afd codegen(char * rpn_n) {
             push(&stack, curr_af);
         } else if (*rpn == '[') {
            rpn += extract_str_in_brackets(&temp, rpn);
-           rpn++; // to be at ] char
+           rpn++; // Pour être au caractère ] (to be at ] char)
            afn_chaine(&curr_af, temp);
            push(&stack, curr_af);
            free(temp);
