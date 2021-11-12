@@ -8,7 +8,7 @@ bool is_char(char c) {
 }
 
 /* 
- * Returns true if char c is a int between 1<=c<=9
+ * Retourne vrai si le caractère c est un entier entre 1<=c<=9 
 */
 bool is_int(char c) {
     // ascii 1 -> 49
@@ -67,7 +67,7 @@ unilex_t * scanner(char * str) {
                     arr_ul[i].type = CHAR;
                     arr_ul[i].val =  *str;
                 } else {
-                    fprintf(stderr, "[scanner] LEXICAL ERROR near character %c\n", *str);
+                    fprintf(stderr, "[scanner] ERREUR LEXICALE au caractère %c\n", *str);
                     exit(-1);
                 }
                 break;
@@ -96,8 +96,9 @@ unilex_t * scanner(char * str) {
  *
  * Reste_F -> CHAR
  *         | ( Expr )
- *         | [char *] //chaine de characters
+ *         | [char *] //chaîne de caractères
 */
+
 uint i = 0;
 uint top = 0;
 char * rpn;
@@ -111,7 +112,7 @@ char * parser(unilex_t * arr_ul, uint size) {
     if(expr() && i == size) {
         return rpn;
     } else {
-        printf("[parser] SYNTAX ERROR near character %c\n", l[i].val);
+        printf("[parser] ERREUR SYNTAXIQUE au caractère %c\n", l[i].val);
         exit(-1);
     }
     rpn = NULL;
@@ -204,19 +205,23 @@ bool reste_f() {
     return false;
 }
 
-/* Take a str starting with a [ and fills res with the str between that
- *first [ and the next ] and returns the size of res */
+/* Prend un str commençant par un [ et remplis res avec le str 
+   entre ce premier [ et le prochain ] et retourne la taille de res
+
+   (Take a str starting with a [ and fills res with the str between that
+   first [ and the next ] and returns the size of res) */
+
 uint extract_str_in_brackets(char** res, char* str) {
     assert(*str== '[');
     str++;
     char * copy = str;
-    // calculate the size of the str in brackets
+    // calcule la taille du str entre crochets (calculate the size of the str in brackets)
     uint size = 0;
     while(*copy != ']') {
         copy++;
         size++;
     }
-    // copy the str
+    // copie du str
     (*res) = calloc(size+1, sizeof(char));
     uint i = 0;
     while(*str != ']') {
