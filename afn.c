@@ -23,12 +23,12 @@ void afn_init(afn *A, uint nbetat, char * alphabet, ullong init, ullong finals) 
     for (i=0; i<A->nbsymb; i++){
         if ( (alphabet[i] < SYMB_ASCII_DEB) ||
              (alphabet[i] > SYMB_ASCII_FIN) ){
-            fprintf(stderr,"[afd_init] caractere ascii numero %d invalide\n", alphabet[i]);
+            fprintf(stderr,"[afd_init] caractère ascii numéro %d invalide\n", alphabet[i]);
             exit(-1);
         }
         symb = (uchar) (alphabet[i] - SYMB_ASCII_DEB);
         if ( A->tsymb[symb] != SYMB_NONE ){
-            fprintf(stderr,"[afd_init] caractere <%c> deja defini (ignorer)\n",alphabet[i]);
+            fprintf(stderr,"[afd_init] caractère <%c> déjà défini (ignorer)\n",alphabet[i]);
         }
         else {
             A->tsymb[symb] = i;
@@ -41,7 +41,7 @@ void afn_init(afn *A, uint nbetat, char * alphabet, ullong init, ullong finals) 
 }
 
 /*
-  Ajoute la relation (<q1>, <s>, <q2>) a l'AFN <A>
+  Ajoute la relation (<q1>, <s>, <q2>) à l'AFN <A>
 */
 void afn_add_trans(afn *A, uint q1, uint s, uint q2) {
     uchar symb = A->tsymb[s-SYMB_ASCII_DEB];
@@ -52,11 +52,11 @@ void afn_add_trans(afn *A, uint q1, uint s, uint q2) {
     }
 
     if ( (q1<0) || (q1>=A->nbetat) ){
-        fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q1);
+        fprintf(stderr, "[add_trans] état <%d> non reconnu\n", q1);
         exit(-1);
     }
     if ( (q2<0) || (q2>=A->nbetat) ){
-        fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q2);
+        fprintf(stderr, "[add_trans] état <%d> non reconnu\n", q2);
         exit(-1);
     }
 
@@ -65,7 +65,7 @@ void afn_add_trans(afn *A, uint q1, uint s, uint q2) {
 
 
 /*
-  Libere la memoire de l'AFN <A>
+  Libère la mémoire de l'AFN <A>
 */
 void afn_free(afn *A) {
     free(A->alphabet);
@@ -112,7 +112,7 @@ void afn_print(afn A) {
 }
 
 /*
- * Deep copy de afn src in the afd dest
+ * Copie en profondeur de afn src dans afd dest
 */
 void afn_copy(afn *dest, afn *src) {
   afn_init(dest, src->nbetat, src->alphabet, src->init, src->finals);
@@ -130,7 +130,7 @@ void afn_copy(afn *dest, afn *src) {
   }
 
 /*
-  Initialise l'AFN <A> a partir des donnees du fichier <nomfichier> au
+  Initialise l'AFN <A> à partir des données du fichier <nomfichier> au
   format:
 
   nb_etats alphabet nbr_etats_initiaux nbr_etats_finals
@@ -180,8 +180,8 @@ void afn_finit(afn *A, char *nomfichier) {
     
     afn_init(A, nb_states, ALPHABET, st_init, st_fin);
 
-    uint st_i; //state_i
-    uint st_j; //state_j
+    uint st_i; //état_i
+    uint st_j; //état_j
     char symb;
     while(fscanf(f, "%d %c %d\n", &st_i, &symb, &st_j) == 3) {
         afn_add_trans(A, st_i, symb, st_j);
@@ -189,8 +189,8 @@ void afn_finit(afn *A, char *nomfichier) {
 }
 
 /*
-  Return 1 if (p,c,q) exists
-  0 if not
+  Retourne 1 si le triplet (p,c,q) existe
+  0 sinon
 */
 ullong exist_trans(afn A, ullong q, char c, ullong p) {
     return ((A.delta[q][A.tsymb[c-SYMB_ASCII_DEB]]) & INT_ETAT(p));
@@ -233,8 +233,8 @@ ullong afn_epsilon_fermeture(afn A, ullong R) {
 }
   
 /*
-  Calcule un automate deterministe equivalent à <A> et affecte le
-  resultat a <D>. Les etats de l'afd sont renumerotés à partir de 1
+  Calcule un automate déterministe équivalent à <A> et affecte le
+  résultat à <D>. Les états de l'afd sont renumerotés à partir de 1
 */
 
 uchar all_states_marked(uchar *track, uchar size) {
@@ -270,8 +270,8 @@ int in2(uint * arr, uint size, ullong q) {
     return is_in;
 }
 
-/* Takes un state and a character in parameter and */
-/* returns all states where can go with that single parameter */
+/* Prend un état et un caractère en paramètre et 
+   retourne tous les états accessibles à partir de cet unique paramètre */ 
 ullong simul(afn A, ullong states, char c) {
     ullong copy;
     ullong res = 0;
@@ -309,7 +309,7 @@ void afn_determinisation(afn A, afd *D) {
     assert(states_q != NULL);
     states_q[0] = afn_epsilon_fermeture(A, A.init);
     printf("init - %lld\n", states_q[0]);
-    // at most all the states are final so the size of finals is 64
+    // Au plus, tous les états sont finaux donc la taille de finals est 64
     uint * finals = calloc(64, sizeof(uint));
     uint nb_finals = 0;
 
@@ -342,7 +342,7 @@ void afn_determinisation(afn A, afd *D) {
                         /*     finals[nb_finals++] = nb_etats - 1; */
                         /*     printf("%u]\n", finals[0]); */
                         /*     printf("%u]\n", finals[1]); */
-                        /*     printf("nb_finasl %u\n", nb_finals); */
+                        /*     printf("nb_finals %u\n", nb_finals); */
                         /* } */
 
                     }
@@ -371,7 +371,7 @@ void afn_determinisation(afn A, afd *D) {
 }
 
 /*
-  Calcule l'automate qui reconnait le caractere <c> dans un alphabet a
+  Calcule l'automate qui reconnaît le caractère <c> dans un alphabet a
   <nbsymb> symboles
 */
 void afn_char(afn *C, char c) {
@@ -380,10 +380,10 @@ void afn_char(afn *C, char c) {
 }
 
 /*
-  Add all transitions of A to C starting at start in C
+  Ajoute toutes les transitions de A dans C en commençant à start dans C (Add all transitions of A to C starting at start in C)
   i.e
-  0 in A is start in B
-  1 in b is start+1 in B
+  0 in A est (is) start in B
+  1 in b est (is) start+1 in B
 */
 void add_all_trans(afn *C, afn A, uint start) {
     for (uint i = 0; A.nbetat > i; i++){
@@ -398,8 +398,8 @@ void add_all_trans(afn *C, afn A, uint start) {
 }
 
 /*
-** Add & trans in C from 0 to all initial states of A
-** renaming 0 in A to start ...
+** Ajoute dans C les epsilon transitions de 0 à tous les états initiaux de A . (Add & trans in C from 0 to all initial states of A)
+** On renomme 0 in A en start (renaming 0 in A to start ...)
 */
 void add_ep_trans(afn *C, afn A, uint start){
     ullong curr_st = 1;
@@ -414,40 +414,39 @@ void add_ep_trans(afn *C, afn A, uint start){
 }
 
 /*
-  Calcule un automate qui reconnait l'union de <A> et <B>
+  Calcule un automate qui reconnaît l'union de <A> et <B>
 */
 void afn_union(afn *C, afn A, afn B) {
     uint nb_states = A.nbetat + B.nbetat;
     ullong fin_states = (A.finals<<1) | (B.finals<<(A.nbetat+1));
 
     afn_init(C, nb_states + 1, ALPHABET, 1, fin_states);
-    // add all trans of A to C
+    // Ajout de toutes les transitions de A dans C (add all trans of A to C)
     add_all_trans(C, A, 1);
-    // add all trabs of B to A
+    // Ajout de toutes les transitions de B dans A (add all trans of B to A)
     add_all_trans(C, B, A.nbetat+1);
-    // add ep trans from c->init to A
+    // Ajout des epsilon transition depuis c->init dans A (add ep trans from c->init to A)
     add_ep_trans(C, A, 1);
-    // add ep trans from c->init to A
+    // Ajout des epsilon transition depuis c->init dans A (add ep trans from c->init to A)
     add_ep_trans(C, A, A.nbetat+1);
     // test
 }
 
 /*
-  Calcule un automate qui reconnait la concatenation de <A> et <B>
+  Calcule un automate qui reconnat la concaténation de <A> et <B>
 */
 void afn_concat(afn *C, afn A, afn B) {
     afn_init(C,A.nbetat+B.nbetat, ALPHABET,A.init, B.finals<<(A.nbetat));
     add_all_trans(C, A, 0);
     add_all_trans(C, B, A.nbetat);
-    // for each final state of A add a ep trans to each initial
-    // state of B
+    // Pour chaque état final de A, ajoute un epsilon transition vers chaque état initial de B (for each final state of A add a ep trans to each initial state of B)
     ullong curr_stateb = 1;
     ullong curr_state = 0;
     ullong curr_statejb = 1;
     ullong curr_statej = 0;
     while (A.finals >= curr_state) {
         if (A.finals & curr_stateb) {
-            // curr_state is a final state
+            // curr_state est un état final (is a final state)
             curr_statejb = 1;
             curr_statej = 0;
             while(B.init >= curr_statejb) {
@@ -464,7 +463,7 @@ void afn_concat(afn *C, afn A, afn B) {
 }
 
 /*
-  Calcule un automate qui reconnait la fermeture de Kleene de <A>
+  Calcule un automate qui reconnaît la fermeture de Kleene de <A>
 */
 void afn_kleene(afn *C, afn A) {
     afn_init(C, A.nbetat+1, A.alphabet, 1, 1);
