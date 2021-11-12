@@ -89,7 +89,11 @@ unilex_t * scanner(char * str) {
  *
  * Fact  -> Reste_F*
  *       |  Reste_F
- *       |  Reste_F{n}
+ *       |  Reste_F REP
+ *
+ * Rep   -> {n} REP 
+ *       | epsilon 
+ *
  * Reste_F -> CHAR
  *         | ( Expr )
  *         | [char *] //chaine de characters
@@ -146,20 +150,27 @@ bool reste_t() {
     return true;
 }
 
+bool rep () {
+    if (i < n && l[i].type == AO) {
+        i++;
+        if ((i < n && l[i].type == NB) && ((i+1) < n && l[++i].type == AF)) {
+            rpn[top++] = l[i-1].val;
+            i++;
+            rep();
+        } else {
+          return false;
+        }
+    }
+    return true;
+        }
 bool fact() {
     if (reste_f()) {
         if (i < n && l[i].val == '*') {
             rpn[top++] = '*';
             i++;
             return true;
-        } else if (i < n && l[i].type == AO) {
-            i++;
-            if ((i < n && l[i].type == NB) && ((i+1) < n && l[++i].type == AF)) {
-                rpn[top++] = l[i-1].val;
-                i++;
-            } else {
+        } else if (rep()) {
                 return false;
-            }
         }
         return true;
     }
