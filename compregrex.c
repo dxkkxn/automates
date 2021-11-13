@@ -2,18 +2,17 @@
 #include "afn.h"
 
 bool is_char(char c) {
+    uint num   = ('0' <=c && c <='9');
     uint minus = ('a' <= c && c <= 'z');
     uint mayus = ('A' <= c && c <= 'Z');
-    return(minus || mayus || c == '&');
+    return( num || minus || mayus || c == '&');
 }
 
 /* 
  * Retourne vrai si le caractère c est un entier entre 1<=c<=9 
 */
-bool is_int(char c) {
-    // ascii 1 -> 49
-    // ascii 9 -> 57
-    return (49<=c && c <=57);
+bool is_int_accept(char c) {
+    return ('1'<=c && c <='9');
 }
 
 void print_arr_ul(unilex_t * arr, uint size) {
@@ -28,7 +27,7 @@ void print_arr_ul(unilex_t * arr, uint size) {
 unilex_t * scanner(char * str) {
     unilex_t * arr_ul = calloc(strlen(str), sizeof(unilex_t));
     assert(arr_ul != NULL);
-    uint i = 0;
+    int i = 0;
     while(*str != '\0') {
         switch (*str) {
             case  '(':
@@ -60,8 +59,8 @@ unilex_t * scanner(char * str) {
                 arr_ul[i].val = '}';
                 break;
             default:
-                if (is_int(*str)) {
-                    arr_ul[i].type = NB;
+                if (0 <= (i-1) && arr_ul[i-1].type == AO && is_int_accept(*str)) {
+                    arr_ul[i].type = OP;
                     arr_ul[i].val = *str;
                 } else if (is_char(*str)) {
                     arr_ul[i].type = CHAR;
@@ -88,8 +87,8 @@ unilex_t * scanner(char * str) {
  *         | epsilon
  *
  * Fact  -> Reste_F*
- *       |  Reste_F
  *       |  Reste_F REP
+ *       |  Reste_F
  *
  * Rep   -> {n} REP 
  *       | epsilon 
@@ -98,16 +97,27 @@ unilex_t * scanner(char * str) {
  *         | ( Expr )
  *         | [char *] //chaîne de caractères
 */
+uint extract_size_rpn(unilex_t * arr_ul, uint size) {
+    uint res = 0;
+    for (uint i = 0; i < size; i++) {
+        if (arr_ul[i].type != AO && arr_ul[i].type != AF
+          && arr_ul[i].type != PO && arr_ul[i].type != PF)
+            res++;
+    }
+    return res;
+}
 
 uint i = 0;
 uint top = 0;
-char * rpn;
 unilex_t * l;
+unilex_t * rpn;
 uint n;
-char * parser(unilex_t * arr_ul, uint size) {
+unilex_t * parser(unilex_t * arr_ul, uint size, uint * size_rpn) {
     l = arr_ul;
     n = size;
-    rpn = calloc(size+1, sizeof(char));
+    *size_rpn = extract_size_rpn(arr_ul, size);
+    rpn = calloc(*size_rpn, sizeof(unilex_t));
+
     assert(rpn != NULL);
     if(expr() && i == size) {
         return rpn;
@@ -115,7 +125,6 @@ char * parser(unilex_t * arr_ul, uint size) {
         printf("[parser] ERREUR SYNTAXIQUE au caractère %c\n", l[i].val);
         exit(-1);
     }
-    rpn = NULL;
     return rpn;
 }
 
@@ -124,10 +133,11 @@ bool expr() {
 }
 
 bool reste_e() {
+    uint old_i = i;
     if (i < n && l[i].val == '+') {
         i++;
         if (terme() && reste_e()) {
-            rpn[top++] = '+';
+            rpn[top++] = l[old_i];
             return true;
         }
         return false;
@@ -140,10 +150,11 @@ bool terme() {
 }
 
 bool reste_t() {
+    uint old_i = i;
     if (i < n && l[i].val == '.') {
         i++;
         if (fact() && reste_t()) {
-            rpn[top++] = '.';
+            rpn[top++] = l[old_i];
             return true;
         }
         return false;
@@ -154,8 +165,9 @@ bool reste_t() {
 bool rep () {
     if (i < n && l[i].type == AO) {
         i++;
-        if ((i < n && l[i].type == NB) && ((i+1) < n && l[++i].type == AF)) {
-            rpn[top++] = l[i-1].val;
+        if ((i+1) < n && l[i].type == OP && l[++i].type == AF) {
+            rpn[top].val = l[i-1].val;
+            rpn[top++].type = OP;
             i++;
             rep();
         } else {
@@ -163,15 +175,14 @@ bool rep () {
         }
     }
     return true;
-        }
+}
+
 bool fact() {
     if (reste_f()) {
         if (i < n && l[i].val == '*') {
-            rpn[top++] = '*';
+            rpn[top++] = l[i];
             i++;
-            return true;
         } else if (rep()) {
-                return false;
         }
         return true;
     }
@@ -180,8 +191,7 @@ bool fact() {
 
 bool reste_f() {
     if ( i < n && l[i].type == CHAR) {
-        rpn[top++] = l[i].val;
-        i++;
+        rpn[top++] = l[i++];
         return true;
     } else if (i < n && l[i].type == PO) {
         i++;
@@ -190,15 +200,15 @@ bool reste_f() {
             return true;
         }
     } else if (i < n && l[i].type == CO) {
-        rpn[top++] = l[i++].val;
+        rpn[top++] = l[i++];
         while (i < n && l[i].type == CHAR) {
-            rpn[top++] = l[i].val;
+            rpn[top++] = l[i];
             i++;
         }
         if (i == n || l[i].type != CF) {
             return false;
         }
-        rpn[top++] = l[i].val;
+        rpn[top++] = l[i];
         i++;
         return true;
     }
@@ -211,60 +221,62 @@ bool reste_f() {
    (Take a str starting with a [ and fills res with the str between that
    first [ and the next ] and returns the size of res) */
 
-uint extract_str_in_brackets(char** res, char* str) {
-    assert(*str== '[');
-    str++;
-    char * copy = str;
-    // calcule la taille du str entre crochets (calculate the size of the str in brackets)
+uint extract_str_in_brackets(char** res, unilex_t* arr_ul, uint start) {
+    assert(arr_ul[start].val == '[');
+    // calcule la taille du str entre crochets (calculate the size of str in brackets)
     uint size = 0;
-    while(*copy != ']') {
-        copy++;
+    uint i = start+1;
+    while(arr_ul[i].val != ']') {
+        i++;
         size++;
     }
     // copie du str
     (*res) = calloc(size+1, sizeof(char));
-    uint i = 0;
-    while(*str != ']') {
-        *(*res + i) = *str;
+    i = start + 1;
+    uint j = 0;
+    while(arr_ul[i].val != ']') {
+        *(*res + j) = arr_ul[i].val;
         i++;
-        str++;
+        j++;
     }
+    printf("%s\n", *res);
     return size;
 }
 
-afd codegen(char * rpn_n) {
-    printf("here>>>>rpn = %s\n", rpn);
+afd codegen(unilex_t * rpn, uint size) {
     stack_t stack = NULL;
     afn curr_af;
     afn aux_af;
     afn aux_af2;
     char * temp = NULL;
     uint nb_rep;
-    while (*rpn != '\0') {
-        printf("*rpn = %c\n", *rpn);
-        if (is_char(*rpn)) {
-            afn_char(&curr_af, *rpn);
+    uint i = 0;
+    print_arr_ul(rpn, size);
+    while (i < size) {
+        printf("rpn curr char = %c\n", rpn[i].val);
+        if (rpn[i].type == CHAR) {
+            afn_char(&curr_af, rpn[i].val);
             push(&stack, curr_af);
-        } else if (*rpn == '*') {
+        } else if (rpn[i].val == '*') {
             aux_af = pop(&stack);
             afn_kleene(&curr_af, aux_af);
             afn_free(&aux_af);
             push(&stack, curr_af);
-        } else if (*rpn == '.'){
+        } else if (rpn[i].val == '.'){
             aux_af = pop(&stack);
             aux_af2 = pop(&stack);
             afn_concat(&curr_af, aux_af2, aux_af);
             afn_free(&aux_af);
             afn_free(&aux_af2);
             push(&stack, curr_af);
-        } else if (*rpn == '[') {
-           rpn += extract_str_in_brackets(&temp, rpn);
-           rpn++; // Pour être au caractère ] (to be at ] char)
+        } else if (rpn[i].val == '[') {
+           i += extract_str_in_brackets(&temp, rpn, i);
+           i++; // Pour être au caractère ] (to be at ] char)
            afn_chaine(&curr_af, temp);
            push(&stack, curr_af);
            free(temp);
-        } else if (is_int(*rpn)) {
-            nb_rep = *rpn - 48 - 1;
+        } else if (rpn[i].type == OP && is_int_accept(rpn[i].val)) {
+            nb_rep = rpn[i].val - 48 - 1;
             aux_af = pop(&stack);
             afn_copy(&curr_af, &aux_af);
             while (nb_rep) {
@@ -276,7 +288,7 @@ afd codegen(char * rpn_n) {
             push(&stack, curr_af);
             afn_free(&aux_af);
         } else {
-            assert(*rpn == '+');
+            assert(rpn[i].val == '+');
             aux_af = pop(&stack);
             aux_af2 = pop(&stack);
             afn_union(&curr_af, aux_af2, aux_af);
@@ -284,7 +296,7 @@ afd codegen(char * rpn_n) {
             afn_free(&aux_af2);
             push(&stack, curr_af);
         }
-        rpn++;
+        i++;
         print_stack(stack);
     }
     afd res;
@@ -292,6 +304,6 @@ afd codegen(char * rpn_n) {
     afn_determinisation(final, &res);
     afd_print(res);
     afn_free(&final);
-    free(rpn_n);
+    free(rpn);
     return res;
 }

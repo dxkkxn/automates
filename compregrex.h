@@ -8,7 +8,7 @@
 #include "stack.h"
 #include "afn.h"
 
-typedef enum{PO, PF, OP, CHAR, CO, CF, AO, AF, NB} type_t;
+typedef enum{PO, PF, OP, CHAR, CO, CF, AO, AF} type_t;
 typedef struct  {
     type_t type;
     char val;
@@ -17,7 +17,7 @@ typedef unsigned int uint;
 
 void print_arr_ul(unilex_t * arr, uint size);
 unilex_t * scanner(char * str);
-char * parser(unilex_t * arr_ul, uint size);
+unilex_t * parser(unilex_t * arr_ul, uint size, uint * size_rpn);
 bool expr();
 bool reste_e();
 bool terme();

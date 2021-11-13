@@ -7,11 +7,11 @@ int main(int argc, char* argv[]) {
     char * str = argv[2];
     unilex_t * arr_ul = scanner(regex);
     print_arr_ul(arr_ul, strlen(regex));
-    char * rpn = parser(arr_ul, strlen(regex));
+    uint size_rpn;
+    unilex_t * rpn_ul = parser(arr_ul, strlen(regex), &size_rpn);
+    print_arr_ul(rpn_ul, size_rpn);
     free(arr_ul);
-    printf("here --->%s\n", rpn);
-    printf("--->%ld\n", strlen(rpn));
-    afd res = codegen(rpn);
+    afd res = codegen(rpn_ul, size_rpn);
     printf("--->%d\n",afd_simul(str, res));
     afd_free(&res);
 }
