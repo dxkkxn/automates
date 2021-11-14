@@ -11,10 +11,12 @@
 
 L'archive contient les fichiers suivants que nous allons détailler :
 
-- Scanner.c
-- Parser.c
-- Regcomp.c
-- Regcomp.h
+- scanner.c
+- scanner.h 
+- parser.c
+- parser.h
+- regcomp.c
+- regcomp.h
 - afd.c
 - afd.h
 - afn.c
@@ -24,32 +26,13 @@ L'archive contient les fichiers suivants que nous allons détailler :
 - mygrep.c
 - makefile
 
-
-Nous avons utilisé la grammaire suivante :
-
-Expr -> Terme Reste_e
-
-Reste_e -> + Terme Reste_e
-        | epsilon
-
-Terme -> Fact Reste_t
-
-Reste_t -> . Fact Reste_t
-        | epsilon
-
-Fact  -> Reste_F*
-      |  Reste_F
-
-Reste_F -> CHAR
-        | ( Expr )
-
-
 ################################## SCANNER.C ##################################
 
 Il s'agit de l'analyseur lexical. Il va analyser la chaîne de caractères et
-renvoyer une liste d'unité lexicales se distinguant dans 7 catégories parmis le
+renvoyer une liste d'unité lexicales se distinguant dans 8 catégories parmis le
 lexique suivant :
 
+CHAR
 PO  --> '('
 PF  --> ')'
 OP  --> {'.','*','+'}
@@ -57,6 +40,8 @@ CO  --> '['
 CF  --> ']'
 AO  --> '{'
 AF  --> '}'
+
+- Les caractères "CHAR" : reconnus selon la convention adoptée en cours via la fonction "is_char".
 
 - Les opérateurs "OP" : spécifiés dans la liste OP en suivant l'ordre de
                         priorité.
@@ -86,6 +71,25 @@ Sinon, une erreur est explicitée avec le caractère fautif en question.
 
 ################################## PARSER.C  ##################################
 
+Nous avons utilisé la grammaire suivante :
+
+Expr -> Terme Reste_e
+
+Reste_e -> + Terme Reste_e
+        | epsilon
+
+Terme -> Fact Reste_t
+
+Reste_t -> . Fact Reste_t
+        | epsilon
+
+Fact  -> Reste_F*
+      |  Reste_F
+
+Reste_F -> CHAR
+        | ( Expr )
+        
+
 Il s'agit de l'analyseur syntaxique. Il va prendre en entrée la liste d'unités
 lexicales "arr_ul" générée par la fonction scanner et réaliser les actions
 suivantes :
@@ -109,13 +113,15 @@ Reprend le fonctionnement du fichier Codegen du TP2. Il prend en entrée une
 expression postfixee et produit un fichier C qui contient un code à trois
 adresses pour traduire l'évaluation de l'expression rangés avec une pile.
 
-(Affiche également le message "compilé avec succès" si la simulation de la pile
-est un succès.)
-
 
 #################################### AFD.C ####################################
 #################################### AFN.C ####################################
+
+
 ################################### STACK.C ###################################
+
+Simule le fonctionnement d'une pile via les fonctions empiler / dépiler et 
+d'affichage du sommet de la pile.
 
 
 ################################### MYGREP.C ##################################
