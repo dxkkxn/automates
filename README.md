@@ -102,7 +102,7 @@ Remarque : Les règles de passage en notation polonaise inversée s'appliquent c
 EXEMPLE :  (a+b).[ac]{3}  ------>  ab+[ac].3
               INFIXE                POSTFIXE
 ```
-
+Remarque : Si vous avez besoin d'enchainer des `{}` et `*` (par example `(a.b){2}*`), il faudra ajouter de parenthèses devant la première expression `((a.b){2})*`
 
 ### **regcomp.c**
 Prend une expression postfixée en paramètre et construit un AFN reconnaissant 
@@ -150,5 +150,9 @@ acceptée
 ```bash
 ./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'ouokokokokou'
 rejetée
+```
+```bash
+./mygrep '((a.b){2})*' 'abababab'
+acceptée
 ```
 # BENJELLOUN Youssef / LEAL André / Groupe 1.A
