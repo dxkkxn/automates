@@ -7,14 +7,14 @@
 #include <stdlib.h>
 
 /*
- * PO - Parenthese Ouvrant
- * PF - Parenthese Fermant
- * OP - Operateur
- * CHAR - Character
+ * PO - Parenthèse Ouvrante
+ * PF - Parenthèse Fermante
+ * OP - Opérateur
+ * CHAR - Caractère
  * CO - Crochet Ouvrant
  * CF - Crochet Fermant
- * AO - Accolade Ouvrant
- * AF - Accolade Fermant
+ * AO - Accolade Ouvrante
+ * AF - Accolade Fermante
 */
 typedef enum{PO, PF, OP, CHAR, CO, CF, AO, AF} type_t;
 
