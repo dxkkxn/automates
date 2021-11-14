@@ -98,7 +98,7 @@ Rep   -> {n} REP
 
 Reste_F -> CHAR
          | ( Expr )
-         | [char *] //chaîne de caractères
+         | [char *]    //chaîne de caractères
        
 
 Il s'agit de l'analyseur syntaxique. Il va prendre en entrée la liste d'unités
@@ -154,9 +154,13 @@ empiler / dépiler et affichage du sommet de la pile.
 
 ################################### MYGREP.C ##################################
 
---> La ligne de commande pour lancer le fichier est :
+--> La ligne de commande pour l'exécution est la suivante :
     ./mygrep <ExprReg> <Chaîne>
 
 Assemble dans un main le déroulement successif des fonctions scanner, parser et
 regcomp pour simuler un AFD et afficher si oui ou non la chaîne entrée 
 appartient au langage dénoté par l'expression régulière.
+
+EXEMPLES d'utilisation : 
+
+- 
