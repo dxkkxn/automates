@@ -4,7 +4,7 @@
 #include "regcomp.h"
 int main(int argc, char* argv[]) {
     if (argc != 3) {
-        printf("ERREUR MANQUE D'ARGUMENTS Saissisez la expression regulier et la chaine a evaluer\n");
+        printf("ERREUR ARGUMENTS MANQUANTS : Saisissez l'expression regulière et la chaîne à evaluer\n");
         return -1;
     }
     char * regex = argv[1];
@@ -23,9 +23,9 @@ int main(int argc, char* argv[]) {
 
     afd res = regcomp(rpn_ul, size_rpn);
     if (afd_simul(str, res)) {
-        printf("acceptee\n");
+        printf("acceptée\n");
     } else {
-        printf("rejetee\n");
+        printf("rejetée\n");
     }
     free(rpn_ul);
     afd_free(&res);
