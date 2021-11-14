@@ -121,34 +121,34 @@ Implémentation d'une pile avec des AFN, en ayant à disposition les fonctions e
 ## Exemples
 ```bash
 $ ./mygrep '(a+b.c+d)*.(c+d)' 'acbdc'
-acceptee 
+acceptée 
 ```
 
 ```bash
 $ ./mygrep '(a+b.c+d)*.(c+d)' ''
-rejetee
+rejetée
 ```
 
 ```bash
 $ ./mygrep '(a+b.c+d)*.(c+d)' 'ab'
-rejetee
+rejetée
 ```
 
 ```bash
 $ ./mygrep '(a*.b).[ab]{4}' 'aaababababab'
-acceptee  
+acceptée  
 ```
 
 ```bash
 $ ./mygrep '(a*.b).[ab]{4}' 'bbabababab' 
-rejetee
+rejetée
 ```
 ```bash
 ./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'toutestokokokokok'
-acceptee
+acceptée
 ```
 ```bash
 ./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'ouokokokokou'
-rejetee
+rejetée
 ```
 # BENJELLOUN Youssef / LEAL André / Groupe 1.A
