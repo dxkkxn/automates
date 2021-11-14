@@ -120,7 +120,7 @@ Implémentation d'une pile avec des AFN, en ayant à disposition les fonctions e
 
 ## Exemples
 ```bash
-$ ./mygrep '(a+b.c+d)*.(c+d)' 'acbdc'
+$ ./mygrep '((a+b).(c+d))*.(c+d)' 'acbdc'
 acceptée 
 ```
 
