@@ -51,7 +51,7 @@ unilex_t * scanner(char * str) {
     return arr_ul;
 }
 /*
-** Affiche le tableau d'unites lexicales
+** Affiche le tableau d'unités lexicales
  */
 void print_arr_ul(unilex_t * arr, uint size) {
     char * types[8];
@@ -76,8 +76,8 @@ void print_arr_ul(unilex_t * arr, uint size) {
 */
 
 /*
-** Renvoi vrai si le caractere c est un caractere valide
-** selon la convention adopte' en cours
+** Renvoie vrai si le caractère c est un caractère valide
+** selon la convention adoptée en cours
  */
 bool is_char(char c) {
     uint num   = ('0' <=c && c <='9');
