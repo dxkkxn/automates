@@ -51,10 +51,11 @@ AF  --> '}'
 
 - Les parenthèses fermantes "PF" : identifiées en tant que caractère (str).
 
-- Facultatif : Ajout des acolades ouvrantes "AO" et fermantes "AF" identifiées
-               en tant que caractère (str) pour modéliser Exreg{n} qui permet la
-               répétition n fois d'une expression régulière. (NB : un seul
-               chiffre est accepté par paire d'acolades).
+- Facultatif : Ajout des accolades ouvrantes "AO" et fermantes "AF" identifiées
+               en tant que caractère (str) pour modéliser Exreg{n} qui permet 
+               la répétition n fois d'une expression régulière. 
+               (NB : pour {x} on accepte x tel que 1<=x<=9 soit un chiffre 
+               positif par paire d'accolades).
 
 - Facultatif : Ajout des crochets ouvrants "CO" et fermants "CF"
                identifiés en tant que caractère (str) pour modéliser
@@ -69,6 +70,10 @@ Sinon, une erreur est explicitée avec le caractère fautif en question.
 
 --> Les sauts de lignes et les espaces sont ignorés.
 
+--> NB : Pour écrire une exp{x}* , c'est à dire des accolades suivies de 
+         l'étoile de kleene, il faut obligatoirement mettre des parenthèses i.e 
+         (exp{x})*
+
 
 ################################## PARSER.C  ##################################
 
@@ -77,19 +82,24 @@ Nous avons utilisé la grammaire suivante :
 Expr -> Terme Reste_e
 
 Reste_e -> + Terme Reste_e
-        | epsilon
-
+         | epsilon
+       
 Terme -> Fact Reste_t
 
 Reste_t -> . Fact Reste_t
-        | epsilon
+         | epsilon
 
 Fact  -> Reste_F*
-      |  Reste_F
+       |  Reste_F REP
+       |  Reste_F
+
+Rep   -> {n} REP
+       | epsilon
 
 Reste_F -> CHAR
-        | ( Expr )
-        
+         | ( Expr )
+         | [char *] //chaîne de caractères
+       
 
 Il s'agit de l'analyseur syntaxique. Il va prendre en entrée la liste d'unités
 lexicales "arr_ul" générée par la fonction scanner et réaliser les actions
@@ -100,29 +110,46 @@ suivantes :
  finale.
 ---> Elle est retournée en notation polonaise inversée (postfixe)
 
-- Sinon il affiche deux erreurs possibles :
-1/ La chaîne n'a pas été lue en entier
-2/ Erreur syntaxique
+- Sinon il affiche "ERREUR SYNTAXIQUE" en précisant le caractère fautif. 
 
 
-EXEMPLE :
+--> NB : Ajout de {n} REP pour pouvoir reconnaître exp{x}{y}{z}.
+
+--> NB : Les règles de passage en notation polonaise inversée s'appliquent 
+         comme pour les expressions arithmétiques et booléennes sauf pour : 
+
+         - Les crochets [] qui ne changent pas de position. En effet, il est 
+         nécessaire de garder l'information du début et de la fin de la chaîne.
+         - Les accolades {} qui sont supprimées car la visualisation des
+         chiffres est suffisante. 
+  
+
+EXEMPLE :  (a+b).[ac]{3}  ------>  ab+[ac].3
+              INFIXE                POSTFIXE
 
 
 ################################## REGCOMP.C ##################################
 
-Reprend le fonctionnement du fichier Codegen du TP2. Il prend en entrée une
-expression postfixee et produit un fichier C qui contient un code à trois
-adresses pour traduire l'évaluation de l'expression rangés avec une pile.
+Prend une expression postfixée en paramètre et construit un AFN reconnaissant 
+cette expression. 
 
 
 #################################### AFD.C ####################################
+
+Implémentation de toutes les fonctions nécessaires à la mise en place d'un
+automate fini déterministe. 
+
+
 #################################### AFN.C ####################################
+
+Implémentation de toutes les fonctions nécessaires à la mise en place d'un
+automate fini non-déterministe. 
 
 
 ################################### STACK.C ###################################
 
-Simule le fonctionnement d'une pile via les fonctions empiler / dépiler et 
-d'affichage du sommet de la pile.
+Implémentation d'une pile avec des AFN, en ayant à disposition les fonctions 
+empiler / dépiler et affichage du sommet de la pile.
 
 
 ################################### MYGREP.C ##################################
@@ -131,13 +158,5 @@ d'affichage du sommet de la pile.
     ./mygrep <ExprReg> <Chaîne>
 
 Assemble dans un main le déroulement successif des fonctions scanner, parser et
-regcomp (codegen) ainsi que la simulation d'un AFD pour afficher si oui ou non
-la chaîne entrée appartient au langage dénoté par l'expression régulière.
-
-EXEMPLE : de compilation de commande : 
-
-
-
-
-(- Exemples d'utilisation :
- - Remarques :)
+regcomp pour simuler un AFD et afficher si oui ou non la chaîne entrée 
+appartient au langage dénoté par l'expression régulière.
