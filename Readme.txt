@@ -32,7 +32,7 @@ Il s'agit de l'analyseur lexical. Il va analyser la chaîne de caractères et
 renvoyer une liste d'unité lexicales se distinguant dans 8 catégories parmis le
 lexique suivant :
 
-CHAR
+CHAR --> {a-z} {A-Z} {0-9}
 PO  --> '('
 PF  --> ')'
 OP  --> {'.','*','+'}
@@ -41,10 +41,11 @@ CF  --> ']'
 AO  --> '{'
 AF  --> '}'
 
-- Les caractères "CHAR" : reconnus selon la convention adoptée en cours via la fonction "is_char".
+- Les caractères "CHAR" : reconnus selon la convention adoptée en cours via la 
+                          fonction "is_char".
 
-- Les opérateurs "OP" : spécifiés dans la liste OP en suivant l'ordre de
-                        priorité.
+- Les opérateurs "OP" : identifiés en tant que caractère (str) et spécifiés dans 
+                        la liste OP en suivant l'ordre de priorité.
 
 - Les parenthèses ouvrantes "PO" : identifiées en tant que caractère (str).
 
@@ -133,7 +134,7 @@ Assemble dans un main le déroulement successif des fonctions scanner, parser et
 regcomp (codegen) ainsi que la simulation d'un AFD pour afficher si oui ou non
 la chaîne entrée appartient au langage dénoté par l'expression régulière.
 
-EXEMPLE : de compilation d'un fichier nommé exemple1 :
+EXEMPLE : de compilation de commande : 
 
 
 
