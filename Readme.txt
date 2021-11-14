@@ -161,6 +161,32 @@ Assemble dans un main le déroulement successif des fonctions scanner, parser et
 regcomp pour simuler un AFD et afficher si oui ou non la chaîne entrée 
 appartient au langage dénoté par l'expression régulière.
 
-EXEMPLES d'utilisation : 
+quelques EXEMPLES d'utilisation : 
 
-- 
+./mygrep '(a+b.c+d)*.(c+d)' 'acbdc'
+
+---> chaîne acceptée 
+
+./mygrep '(a+b.c+d)*.(c+d)' ''
+
+---> chaîne rejetée
+
+./mygrep '(a+b.c+d)*.(c+d)' 'ab'
+
+---> chaîne rejetée
+
+./mygrep '(a*.b).[ab]{4}' 'aaababababab'
+
+---> chaîne acceptée  
+
+./mygrep '(a*.b).[ab]{4}' 'bbabababab' 
+
+---> chaîne rejetée
+
+./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'toutestokokokokok'
+
+---> chaîne acceptée
+
+./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'ouokokokokou'
+
+--> chaîne rejetée
