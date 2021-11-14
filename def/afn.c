@@ -219,7 +219,7 @@ ullong afn_epsilon_fermeture(afn A, ullong R) {
 
 
 /*
-  Calcule un automate déterministe équivalent à <A> et affecte le
+  Calcule un automate déterministe équivalant à <A> et affecte le
   résultat à <D>.
 */
 void afn_determinisation(afn A, afd *D) {
@@ -249,7 +249,7 @@ void afn_determinisation(afn A, afd *D) {
                 if (temp) {
                     ferm = afn_epsilon_fermeture(A, temp);
                     if(!in(states_q, nb_etats, ferm)) {
-                        // verif taille
+                        // Vérif de la taille
                         if(nb_etats >= size_states_q) {
                             size_states_q += 64;
                             states_q = realloc(states_q, size_states_q * sizeof(ullong));
@@ -258,9 +258,9 @@ void afn_determinisation(afn A, afd *D) {
                         states_q[nb_etats] = ferm;
                         nb_etats++;
                     }
-                    // On garde en memoire les transitions pour les ajouter ulterieurement
+                    // On garde en mémoire les transitions pour les ajouter ultérieurement
                     trans_t new_trans = {i,*sigma, indexof(states_q, nb_etats, ferm)};
-                    // Verif de la taille
+                    // Vérif de la taille
                     if (trans_i >= size_of_trans) {
                         size_of_trans += 64;
                         trans = realloc(trans, size_of_trans * sizeof(trans_t));
@@ -305,18 +305,18 @@ void afn_union(afn *C, afn A, afn B) {
     // Ajout de toutes les transitions de A dans C
     add_all_trans(C, A, 1);
 
-    // Ajout de toutes les transitions de B dans A commencant a A.nbetat+1
+    // Ajout de toutes les transitions de B dans A commençant à A.nbetat+1
     add_all_trans(C, B, A.nbetat+1);
 
-    // Ajout des epsilon transition depuis 0 (C->init) aux  etats initiaux de A
+    // Ajout des epsilon transition depuis 0 (C->init) aux  états initiaux de A
     add_ep_trans(C, A, 1);
 
-    // Ajout des epsilon transition depuis 0 (C->init) aux  etats initiaux de B
+    // Ajout des epsilon transition depuis 0 (C->init) aux  états initiaux de B
     add_ep_trans(C, B, A.nbetat+1);
 }
 
 /*
-  Calcule un automate qui reconnat la concaténation de <A> et <B>
+  Calcule un automate qui reconnaît la concaténation de <A> et <B>
 */
 void afn_concat(afn *C, afn A, afn B) {
     afn_init(C,A.nbetat+B.nbetat, ALPHABET,A.init, B.finals<<(A.nbetat));
@@ -324,9 +324,9 @@ void afn_concat(afn *C, afn A, afn B) {
     add_all_trans(C, B, A.nbetat);
     // Pour chaque état final de A, ajoute un epsilon transition vers chaque état initial de B
     ullong curr_stateb = 1; //binaire
-    ullong curr_state = 0; // decimal
+    ullong curr_state = 0; // décimal
     ullong curr_statejb = 1; //binaire
-    ullong curr_statej = 0; // decimal
+    ullong curr_statej = 0; // décimal
     while (A.finals >= curr_state) {
         if (A.finals & curr_stateb) {
             // curr_state est un état final
@@ -356,16 +356,16 @@ void afn_kleene(afn *C, afn A) {
     ullong temp;
     uint state_f;
     uint state_i;
-    // Ajout des epsilon transitions depuis chaque etat final vers
-    // notre nouveau etat initial 0
+    // Ajout des epsilon transition depuis chaque état final vers
+    // notre nouveau état initial 0
     while(finals) {
        temp = finals;
        finals &= finals - 1;
        state_f = log(temp^finals)/log(2);
        afn_add_trans(C, state_f+1, '&', 0);
     }
-    // Ajout des epsilon transitions depuis  notre nouveau etat initial 0
-    // vers chaque etat initial
+    // Ajout des epsilon transition depuis notre nouveau état initial 0
+    // vers chaque état initial
     while(initials) {
        temp = initials;
        initials &= initials - 1;
@@ -375,8 +375,8 @@ void afn_kleene(afn *C, afn A) {
 }
 
 /*
-** Prends une chaine de caractères (abcdef..) et construit l'afn
-** qui reconnait a ou b ou c ou d ou f ....
+** Prend une chaîne de caractères (abcdef..) et construit l'afn
+** qui reconnaît a ou b ou c ou d ou f ....
 */
 void afn_chaine(afn *C, char * str) {
     afn_init(C, 2, ALPHABET, 1, 2);
@@ -410,8 +410,8 @@ int in2(uint* arr, uint size, uint q) {
 }
 
 /*
-** Ajoute dans C les epsilon transitions de 0 à tous les états initiaux de A . (Add & trans in C from 0 to all initial states of A)
-** On renomme 0 in A en start (renaming 0 in A to start ...)
+** Ajoute dans C les epsilon transitions de 0 à tous les états initiaux de A.
+** On renomme 0 in A en start.
 */
 void add_ep_trans(afn *C, afn A, uint start){
     ullong curr_st = 1;
@@ -428,8 +428,8 @@ void add_ep_trans(afn *C, afn A, uint start){
 /*
   Ajoute toutes les transitions de A dans C en commençant à start dans C
   i.e
-  l'état 0 en A est l'état start en B
-  l'état 1 en A est l'état start+1 en B
+  l'état 0 dans A est l'état start dans B
+  l'état 1 dans A est l'état start+1 dans B
 */
 void add_all_trans(afn *C, afn A, uint start) {
     for (uint i = 0; A.nbetat > i; i++){
@@ -444,7 +444,7 @@ void add_all_trans(afn *C, afn A, uint start) {
 }
 
 /* Prend un ensemble d'états et un caractère en paramètre et
-   revoie tous les états accessibles à partir de cet unique caractère */
+   renvoie tous les états accessibles à partir de cet unique caractère */
 ullong simul(afn A, ullong states, char c) {
     ullong copy;
     ullong res = 0;
@@ -462,7 +462,7 @@ ullong simul(afn A, ullong states, char c) {
     return res;
 }
 
-/* Revoie l'index de target en arr */
+/* Renvoie l'index de target en arr */
 uint indexof(ullong *arr, uint size, ullong target) {
     bool found = false;
     uint i;
