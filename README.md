@@ -98,7 +98,6 @@ Remarque : Ajout de {n} REP pour pouvoir reconnaître exp{x}{y}{z}.
 Remarque : Les règles de passage en notation polonaise inversée s'appliquent comme pour les expressions arithmétiques et booléennes sauf pour : 
 * Les crochets `[]` qui ne changent pas de position. En effet, il est nécessaire de garder l'information du début et de la fin de la chaîne.
 * Les accolades `{}` qui sont supprimées car la visualisation des chiffres est suffisante. 
-`<p> adfasdfasfa </p>`  
 ```
 EXEMPLE :  (a+b).[ac]{3}  ------>  ab+[ac].3
               INFIXE                POSTFIXE
