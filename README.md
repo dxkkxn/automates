@@ -90,6 +90,7 @@ Il s'agit de l'analyseur syntaxique. Il va prendre en entrée la liste d'unités
 lexicales "arr_ul" générée par la fonction scanner et réaliser les actions
 suivantes :
 * Si la chaîne en entrée est une expression conforme :
+
        * Elle est déroulée selon la grammaire pré-établie jusqu'à avoir sa structure
  finale.
  
