@@ -52,11 +52,9 @@ lexique suivant :
 
 
 Si un caractère est reconnu, il est ajouté à la liste d'unité lexicales
-"arr_ul" qui sera renvoyée à la fin de la fonction.
+"arr_ul" qui sera renvoyée à la fin de la fonction. Sinon, une erreur est explicitée avec le caractère fautif en question.
 
-Sinon, une erreur est explicitée avec le caractère fautif en question.
-
---> Les sauts de lignes et les espaces ne sont pas ignorés car peuvent porter à confusion.
+Les sauts de lignes et les espaces ne sont pas ignorés car peuvent porter à confusion.
 
 
 ### **parser.c**
@@ -89,88 +87,69 @@ Reste_F -> CHAR
 Il s'agit de l'analyseur syntaxique. Il va prendre en entrée la liste d'unités
 lexicales "arr_ul" générée par la fonction scanner et réaliser les actions
 suivantes :
-* Si la chaîne en entrée est une expression conforme :
+* Si la liste d'unités lexicales en entrée est une expression conforme :
+    * Elle est déroulée selon la grammaire pré-établie jusqu'à avoir sa structure finale.
+    * Elle est retournée en "notation polonaise inversée" (postfixe)
 
-       * Elle est déroulée selon la grammaire pré-établie jusqu'à avoir sa structure
- finale.
- 
-* Item 1
-       * Nested item
-       * Neste item 
+* Sinon il affiche **ERREUR SYNTAXIQUE** en précisant le caractère fautif. 
 
----> Elle est retournée en notation polonaise inversée (postfixe)
+Remarque : Ajout de {n} REP pour pouvoir reconnaître exp{x}{y}{z}.
 
-- Sinon il affiche "ERREUR SYNTAXIQUE" en précisant le caractère fautif. 
-
-
---> NB : Ajout de {n} REP pour pouvoir reconnaître exp{x}{y}{z}.
-
---> NB : Les règles de passage en notation polonaise inversée s'appliquent 
-         comme pour les expressions arithmétiques et booléennes sauf pour : 
-
-         - Les crochets [] qui ne changent pas de position. En effet, il est 
-         nécessaire de garder l'information du début et de la fin de la chaîne.
-         - Les accolades {} qui sont supprimées car la visualisation des
-         chiffres est suffisante. 
-  
-
+Remarque : Les règles de passage en notation polonaise inversée s'appliquent comme pour les expressions arithmétiques et booléennes sauf pour : 
+* Les crochets `[]` qui ne changent pas de position. En effet, il est nécessaire de garder l'information du début et de la fin de la chaîne.
+* Les accolades `{}` qui sont supprimées car la visualisation des chiffres est suffisante. 
+`<p> adfasdfasfa </p>`  
+```
 EXEMPLE :  (a+b).[ac]{3}  ------>  ab+[ac].3
               INFIXE                POSTFIXE
+```
 
 
-################################## REGCOMP.C ##################################
-
+### **regcomp.c**
 Prend une expression postfixée en paramètre et construit un AFN reconnaissant 
 cette expression. 
+### **afd.c**
+Implémentation de toutes les fonctions nécessaires à la mise en place d'un automate fini déterministe. 
 
 
-#################################### AFD.C ####################################
-
-Implémentation de toutes les fonctions nécessaires à la mise en place d'un
-automate fini déterministe. 
+### **afn.c**
+Implémentation de toutes les fonctions nécessaires à la mise en place d'un automate fini non-déterministe. 
 
 
-#################################### AFN.C ####################################
+### **stack.c**
+Implémentation d'une pile avec des AFN, en ayant à disposition les fonctions empiler / dépiler et affichage du sommet de la pile.
 
-Implémentation de toutes les fonctions nécessaires à la mise en place d'un
-automate fini non-déterministe. 
+## Exemples
+```bash
+$ ./mygrep '(a+b.c+d)*.(c+d)' 'acbdc'
+acceptee 
+```
 
+```bash
+$ ./mygrep '(a+b.c+d)*.(c+d)' ''
+rejetee
+```
 
-################################### STACK.C ###################################
+```bash
+$ ./mygrep '(a+b.c+d)*.(c+d)' 'ab'
+rejetee
+```
 
-Implémentation d'une pile avec des AFN, en ayant à disposition les fonctions 
-empiler / dépiler et affichage du sommet de la pile.
+```bash
+$ ./mygrep '(a*.b).[ab]{4}' 'aaababababab'
+acceptee  
+```
 
-
-
-
-quelques EXEMPLES d'utilisation : 
-
-./mygrep '(a+b.c+d)*.(c+d)' 'acbdc'
-
----> chaîne acceptée 
-
-./mygrep '(a+b.c+d)*.(c+d)' ''
-
----> chaîne rejetée
-
-./mygrep '(a+b.c+d)*.(c+d)' 'ab'
-
----> chaîne rejetée
-
-./mygrep '(a*.b).[ab]{4}' 'aaababababab'
-
----> chaîne acceptée  
-
-./mygrep '(a*.b).[ab]{4}' 'bbabababab' 
-
----> chaîne rejetée
-
+```bash
+$ ./mygrep '(a*.b).[ab]{4}' 'bbabababab' 
+rejetee
+```
+```bash
 ./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'toutestokokokokok'
-
----> chaîne acceptée
-
+acceptee
+```
+```bash
 ./mygrep '(s+t+o+u+e)*.[ok]{2}{2}' 'ouokokokokou'
-
---> chaîne rejetée
+rejetee
+```
 # BENJELLOUN Youssef / LEAL André / Groupe 1.A
