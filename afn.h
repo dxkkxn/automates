@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <error.h>
+#include <assert.h>
+
 #include "afd.h"
+#include "math.h"
 
 
 
@@ -13,7 +16,6 @@
 
 typedef unsigned int uint;
 typedef unsigned long long int ullong;
-typedef enum{false = 0, true} bool;
 
 typedef struct {
   ullong q;
@@ -51,6 +53,7 @@ void afn_copy(afn *dest, afn* src);
  * HELPER FUNCTONS
 */
 int in(ullong* arr, uint size, ullong q);
+int in2(uint* arr, uint size, uint q);
 void add_ep_trans(afn *C, afn A, uint start);
 void add_all_trans(afn *C, afn A, uint start);
 ullong simul(afn A, ullong states, char c);

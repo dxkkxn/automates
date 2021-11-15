@@ -1,7 +1,6 @@
 #include "regcomp.h"
 
-
-afd codegen(unilex_t * rpn, uint size) {
+afd regcomp(unilex_t * rpn, uint size) {
     stack_t stack = NULL;
     afn curr_af;
     afn aux_af;
@@ -27,7 +26,7 @@ afd codegen(unilex_t * rpn, uint size) {
             push(&stack, curr_af);
         } else if (rpn[i].val == '[') {
            i += extract_str_in_brackets(&temp, rpn, i);
-           i++; // Pour être au caractère ] (to be at ] char)
+           i++; // Pour être au caractère ]
            afn_chaine(&curr_af, temp);
            push(&stack, curr_af);
            free(temp);
@@ -58,7 +57,6 @@ afd codegen(unilex_t * rpn, uint size) {
     afn final = pop(&stack);
     afn_determinisation(final, &res);
     afn_free(&final);
-    free(rpn);
     return res;
 }
 
@@ -68,13 +66,11 @@ afd codegen(unilex_t * rpn, uint size) {
 
 /* Prend un str commençant par un [ et remplis res avec le str
    entre ce premier [ et le prochain ] et retourne la taille de res
-
-   (Take a str starting with a [ and fills res with the str between that
-   first [ and the next ] and returns the size of res) */
+*/
 
 uint extract_str_in_brackets(char** res, unilex_t* arr_ul, uint start) {
     assert(arr_ul[start].val == '[');
-    // calcule la taille du str entre crochets (calculate the size of str in brackets)
+    // calcule la taille du str entre crochets
     uint size = 0;
     uint i = start+1;
     while(arr_ul[i].val != ']') {
