@@ -1,4 +1,4 @@
-# I53 Automates (BENJELLOUN Youssef, LEAL Andre)
+# I53 Automates 
 
 ## Utilisation
 ```bash
@@ -155,4 +155,4 @@ rejetée
 ./mygrep '((a.b){2})*' 'abababab'
 acceptée
 ```
-# BENJELLOUN Youssef / LEAL André / Groupe 1.A
+### BENJELLOUN Youssef / LEAL André / Groupe 1.A
